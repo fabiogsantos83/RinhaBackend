@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -12,7 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RinhaBackend.Application\RinhaBackend.Application.csproj" />
     <ProjectReference Include="..\RinhaBackend.Domain\RinhaBackend.Domain.csproj" />
+    <ProjectReference Include="..\RinhaBackend.Infrastructure\RinhaBackend.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
