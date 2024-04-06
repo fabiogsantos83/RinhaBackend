@@ -2,7 +2,7 @@
 using RinhaBackend.Domain.Commands;
 using RinhaBackend.Domain.Interfaces;
 
-namespace RinhaBackend.Controllers
+namespace RinhaBackend.Api.Controllers
 {
     [Route("pessoas")]
     [ApiController]

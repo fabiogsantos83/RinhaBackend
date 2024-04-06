@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RinhaBackend", "RinhaBackend\RinhaBackend.csproj", "{B2B44B5B-6FE6-4F25-9D04-32F6CE60133E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RinhaBackend.Api", "RinhaBackend.Api\RinhaBackend.Api.csproj", "{B2B44B5B-6FE6-4F25-9D04-32F6CE60133E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RinhaBackend.Domain", "RinhaBackend.Domain\RinhaBackend.Domain.csproj", "{ADBA2A43-F116-45CC-B5EB-71F3340717D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RinhaBackend.Infrastructure", "RinhaBackend.Infrastructure\RinhaBackend.Infrastructure.csproj", "{7F046F69-4126-4214-B5FE-52263C3F653A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RinhaBackend.Infrastructure", "RinhaBackend.Infrastructure\RinhaBackend.Infrastructure.csproj", "{7F046F69-4126-4214-B5FE-52263C3F653A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RinhaBackend.Application", "RinhaBackend.Application\RinhaBackend.Application.csproj", "{3BF2D37C-CC7A-4D81-B357-B0B2A43E1C6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RinhaBackend.Application", "RinhaBackend.Application\RinhaBackend.Application.csproj", "{3BF2D37C-CC7A-4D81-B357-B0B2A43E1C6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
