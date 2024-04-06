@@ -34,6 +34,8 @@ namespace RinhaBackend.Api.Controllers
         {
             var result = await _service.GetPessoa(id);
 
+            if (result == null) return NotFound();
+
             return Ok(result);
 
         }
@@ -45,6 +47,8 @@ namespace RinhaBackend.Api.Controllers
         public async Task<IActionResult> GetPessoas([FromQuery] string t)
         {
             var result = await _service.ListPessoas(t);
+            
+            if (result == null) return NotFound();
 
             return Ok(result);
         }

@@ -1,4 +1,5 @@
-﻿using RinhaBackend.Domain.Commands;
+﻿using FluentValidation;
+using RinhaBackend.Domain.Commands;
 using RinhaBackend.Domain.Entities;
 using RinhaBackend.Domain.Interfaces;
 
@@ -7,13 +8,22 @@ namespace RinhaBackend.Application
     public class PessoaService : IPessoaService
     {
         private readonly IPessoaRepository _repository;
-        public PessoaService(IPessoaRepository repository)
+        private readonly IValidator<AddPessoaRequest> _validator;
+        public PessoaService(IPessoaRepository repository, IValidator<AddPessoaRequest> validator)
         {
             _repository = repository;
+            _validator = validator;
         }
         public async Task<Guid> AddPessoa(AddPessoaRequest request)
         {
             var id = Guid.NewGuid();
+
+            var validationResult = _validator.Validate(request);
+
+            if (!validationResult.IsValid) 
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
 
             var pessoaEntity = new PessoaEntity()
             {
