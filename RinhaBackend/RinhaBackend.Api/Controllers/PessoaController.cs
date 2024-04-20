@@ -22,7 +22,7 @@ namespace RinhaBackend.Api.Controllers
         public async Task<IActionResult> AddPessoa([FromBody] AddPessoaRequest request)
         {
             var result = await _service.AddPessoa(request);
-
+            //var result = Guid.NewGuid();
             return Created($"/pessoas/{result}", null);
         }
 
@@ -36,6 +36,8 @@ namespace RinhaBackend.Api.Controllers
 
             if (result == null) return NotFound();
 
+            //var result = new GetPessoasResponse();
+
             return Ok(result);
 
         }
@@ -47,20 +49,12 @@ namespace RinhaBackend.Api.Controllers
         public async Task<IActionResult> GetPessoas([FromQuery] string t)
         {
             var result = await _service.ListPessoas(t);
-            
+
             if (result == null) return NotFound();
 
+            //var result = new List<GetPessoasResponse>();
             return Ok(result);
         }
-
-        [HttpGet("contagem-pessoas")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetContagemPessoas()
-        {
-            var result = await _service.GetQuantidadePessoas();
-
-            return Ok(result);
-
-        }
+    
     }
 }

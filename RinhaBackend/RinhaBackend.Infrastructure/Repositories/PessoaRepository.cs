@@ -10,15 +10,24 @@ namespace RinhaBackend.Infrastructure.Repositories
     public class PessoaRepository : IPessoaRepository, IDisposable
     {
 
-        private NpgsqlConnection conn;
+        private NpgsqlConnection _conn;
 
-        public PessoaRepository(IConfiguration config)
+        public PessoaRepository(NpgsqlConnection conn)
         {
-            conn = new NpgsqlConnection(config.GetConnectionString("rinha"));
+            _conn = conn;
         }
 
-        public Task Add(PessoaEntity pessoa)
+        private async Task ConnectDB() 
         {
+            if (_conn.State != ConnectionState.Open) 
+            {
+                await _conn.OpenAsync();
+            }
+        }
+        public async Task Add(PessoaEntity pessoa)
+        {
+            await ConnectDB();
+
             var sql = new StringBuilder();
 
             sql.AppendLine("insert into pessoas");
@@ -26,7 +35,7 @@ namespace RinhaBackend.Infrastructure.Repositories
             sql.AppendLine("values");
             sql.AppendLine("(@id, @apelido, @nome, @nascimento, @stack)");
 
-            var comm = conn.CreateCommand();
+            var comm = _conn.CreateCommand();
 
             comm.CommandText = sql.ToString();
             comm.CommandType = CommandType.Text;
@@ -36,13 +45,41 @@ namespace RinhaBackend.Infrastructure.Repositories
             comm.Parameters.Add(new NpgsqlParameter("nascimento", pessoa.Nascimento));
             comm.Parameters.Add(new NpgsqlParameter("stack", pessoa.Stack));
 
-            conn.Open();
+            await comm.ExecuteNonQueryAsync();
+        }
 
-            return comm.ExecuteNonQueryAsync();
+
+        public async Task Add(List<PessoaEntity> pessoas)
+        {
+            await ConnectDB();
+
+            var batch = _conn.CreateBatch();
+            var batchCommands = new List<NpgsqlBatchCommand>();
+
+            foreach (var p in pessoas)
+            {
+                var batchCmd = new NpgsqlBatchCommand(@"
+                        insert into pessoas
+                        (id, apelido, nome, nascimento, stack)
+                        values ($1, $2, $3, $4, $5)
+                        on conflict do nothing;
+                    ");
+                batchCmd.Parameters.AddWithValue(p.Id);
+                batchCmd.Parameters.AddWithValue(p.Apelido);
+                batchCmd.Parameters.AddWithValue(p.Nome);
+                batchCmd.Parameters.AddWithValue(p.Nascimento);
+                batchCmd.Parameters.AddWithValue(p.Stack);
+                batch.BatchCommands.Add(batchCmd);
+
+            }
+
+            await batch.ExecuteNonQueryAsync();
         }
 
         public async Task<PessoaEntity> Get(Guid id)
         {
+            await ConnectDB();
+
             var pessoa = new PessoaEntity();
             var sql = new StringBuilder();
 
@@ -50,14 +87,12 @@ namespace RinhaBackend.Infrastructure.Repositories
             sql.AppendLine("from pessoas");
             sql.AppendLine("where id = @id");
 
-            var comm = conn.CreateCommand();
+            var comm = _conn.CreateCommand();
 
             comm.CommandText = sql.ToString();
             comm.CommandType = CommandType.Text;
             comm.Parameters.Add(new NpgsqlParameter("id", id));
-
-            conn.Open();
-
+            
             var result = await comm.ExecuteReaderAsync();
 
             while (result.Read())
@@ -69,23 +104,60 @@ namespace RinhaBackend.Infrastructure.Repositories
                 pessoa.Apelido = result["apelido"].ToString();
             }
 
+            result.Close();
+
+            return pessoa;
+        }
+
+        public async Task<PessoaEntity> Get(string apelido)
+        {
+            await ConnectDB();
+
+            PessoaEntity pessoa = null;
+            var sql = new StringBuilder();
+
+            sql.AppendLine("select id, apelido, nome, nascimento, stack");
+            sql.AppendLine("from pessoas");
+            sql.AppendLine("where apelido = @apelido");
+
+            var comm = _conn.CreateCommand();
+
+            comm.CommandText = sql.ToString();
+            comm.CommandType = CommandType.Text;
+            comm.Parameters.Add(new NpgsqlParameter("apelido", apelido));
+
+            var result = await comm.ExecuteReaderAsync();
+
+            while (result.Read())
+            {
+                pessoa = new PessoaEntity();
+
+                pessoa.Id = (Guid)result["id"];
+                pessoa.Nome = result["Nome"].ToString();
+                pessoa.Nascimento = (DateTime)result["nascimento"];
+                pessoa.Stack = result["stack"].ToString();
+                pessoa.Apelido = result["apelido"].ToString();
+            }
+
+            result.Close();
+
             return pessoa;
         }
 
         public async Task<long> GetQuantidadePessoas()
         {
+            await ConnectDB();
+
             long quantidade = 0;
             var sql = new StringBuilder();
 
             sql.AppendLine("select count(1) quantidade");
             sql.AppendLine("from pessoas");
 
-            var comm = conn.CreateCommand();
+            var comm = _conn.CreateCommand();
 
             comm.CommandText = sql.ToString();
             comm.CommandType = CommandType.Text;
-
-            conn.Open();
 
             var result = await comm.ExecuteReaderAsync();
 
@@ -93,29 +165,29 @@ namespace RinhaBackend.Infrastructure.Repositories
             {
                 quantidade = (long)result["quantidade"];
             }
+            
+            result.Close();
 
             return quantidade;
         }
 
         public async Task<IEnumerable<PessoaEntity>> List(string termo)
         {
+            await ConnectDB();
+
             var pessoas = new List<PessoaEntity>();
             var sql = new StringBuilder();
 
             sql.AppendLine("select id, apelido, nome, nascimento, stack");
             sql.AppendLine("from pessoas");
-            sql.AppendLine("where apelido like @termo");
-            sql.AppendLine("or nome like @termo");
-            sql.AppendLine("or stack like @termo");
+            sql.AppendLine("where pesquisa like @termo");
             sql.AppendLine("limit 50");
 
-            var comm = conn.CreateCommand();
+            var comm = _conn.CreateCommand();
 
             comm.CommandText = sql.ToString();
             comm.CommandType = CommandType.Text;
             comm.Parameters.Add(new NpgsqlParameter("termo", $"%{termo}%"));
-
-            conn.Open();
 
             var result = await comm.ExecuteReaderAsync();
 
@@ -131,13 +203,17 @@ namespace RinhaBackend.Infrastructure.Repositories
                 });
             }
 
+            result.Close();
+
             return pessoas;
         }
 
 
         public void Dispose()
         {
-            conn.Dispose();
+            if(_conn.State == ConnectionState.Open)
+                _conn.Close();
+            _conn.Dispose();
         }
 
     }

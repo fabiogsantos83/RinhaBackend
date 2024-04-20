@@ -2,6 +2,8 @@
 using RinhaBackend.Domain.Commands;
 using RinhaBackend.Domain.Entities;
 using RinhaBackend.Domain.Interfaces;
+using System.Collections.Concurrent;
+using System.Globalization;
 
 namespace RinhaBackend.Application
 {
@@ -9,10 +11,12 @@ namespace RinhaBackend.Application
     {
         private readonly IPessoaRepository _repository;
         private readonly IValidator<AddPessoaRequest> _validator;
-        public PessoaService(IPessoaRepository repository, IValidator<AddPessoaRequest> validator)
+        private readonly ConcurrentQueue<PessoaEntity> _queuePessoa;
+        public PessoaService(IPessoaRepository repository, IValidator<AddPessoaRequest> validator, ConcurrentQueue<PessoaEntity> queuePessoa)
         {
             _repository = repository;
             _validator = validator;
+            _queuePessoa = queuePessoa;
         }
         public async Task<Guid> AddPessoa(AddPessoaRequest request)
         {
@@ -20,20 +24,28 @@ namespace RinhaBackend.Application
 
             var validationResult = _validator.Validate(request);
 
-            if (!validationResult.IsValid) 
+            if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
+            }
+
+            var pessoa = await _repository.Get(request.Apelido);
+
+            if (pessoa != null) 
+            {
+                throw new ValidationException("Pessoa já cadastrada");
             }
 
             var pessoaEntity = new PessoaEntity()
             {
                 Apelido = request.Apelido,
-                Nascimento = request.Nascimento,
+                Nascimento = Convert.ToDateTime(request.Nascimento),
                 Nome = request.Nome,
                 Stack = String.Join(",", request.Stack),
                 Id = id
             };
 
+            //_queuePessoa.aEnqueue(pessoaEntity);
             await _repository.Add(pessoaEntity);
 
             return id;
@@ -95,7 +107,7 @@ namespace RinhaBackend.Application
             });
 
             return response;
-           
+
         }
 
     }

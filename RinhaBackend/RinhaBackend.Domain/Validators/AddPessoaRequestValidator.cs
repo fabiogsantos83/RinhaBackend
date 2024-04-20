@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using RinhaBackend.Domain.Commands;
+using System.Globalization;
 
 namespace RinhaBackend.Domain.Validators
 {
@@ -35,10 +36,17 @@ namespace RinhaBackend.Domain.Validators
             return true;
         }
 
-        private bool ValidateNascimento(DateTime arg)
+        private bool ValidateNascimento(string arg)
         {
-            if (arg == DateTime.MinValue) return false;
+            DateTime dataNascimentoValida;
+
+            if (!DateTime.TryParseExact(arg, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dataNascimentoValida))
+            {
+                return false;
+            }
+
             return true;
+
         }
     }
 }
