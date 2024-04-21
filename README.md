@@ -13,9 +13,11 @@ Segue [aqui](https://github.com/zanfranceschi/rinha-de-backend-2023-q3) o reposi
 
 ## Instruções para rodar
 Na pasta raiz do projeto rodar o comando abaixo para subir as duas instancias aplicação, o nginx e o postegres em containers do docker: 
+
 **docker-compose up -d**
 
 O comando abaixo remove todos os containers com suas respectivas imagens: 
+
 **docker-compose down --rmi all -v**
 
 ## Tecnologias
