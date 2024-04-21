@@ -20,6 +20,10 @@ O comando abaixo remove todos os containers com suas respectivas imagens:
 
 **docker-compose down --rmi all -v**
 
+Endereço do swagger:
+
+http://localhost:9999/swagger
+
 ## Tecnologias
 
 * Dot Net 7
