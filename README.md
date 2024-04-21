@@ -1,4 +1,4 @@
-# Rinh de Backends
+# Rinha de Backends
 Este projeto foi criado a partir de uma "competição" proposta pelo [zanfranceschi](https://github.com/zanfranceschi) em 2023 chamada Rinha de Backend!
 Fiquei sabendo dessa "rinha" só depois que a competição já tinha sido encerrada mas resolvi desenvolver minha solução para aprendizado e estudos.
 Consegui atingir os resultados sem nenhuma perda de requests e inserções com um projeto simples apenas administrando os recursos disponiveis nas regras da rinha e criando indice Full Text Search no postgres que era o gargalo. 
