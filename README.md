@@ -34,3 +34,5 @@ http://localhost:9999/swagger
 ## Reultado
 
 ![This is an alt text.](/resultado.png "This is a sample image.")
+
+Linkedin: https://www.linkedin.com/in/fabio-guedes-dos-santos-86731046/
